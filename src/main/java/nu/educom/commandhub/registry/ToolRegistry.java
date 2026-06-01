@@ -14,8 +14,8 @@ public class ToolRegistry {
             new ToolDefinition(
                     "echo",
                     "Echo a message",
-                    "echo",
-                    List.of("{message}"),
+                    "cmd.exe",
+                    List.of("/c", "echo", "{message}"),
                     List.of(
                             new ToolParameter("message", "string", true)
                     ),

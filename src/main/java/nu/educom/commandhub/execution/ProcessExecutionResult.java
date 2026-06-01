@@ -1,8 +1,6 @@
-package nu.educom.commandhub.model;
+package nu.educom.commandhub.execution;
 
-public record ExecuteToolResponse(
-        String toolName,
-        String status,
+public record ProcessExecutionResult(
         String stdout,
         String stderr,
         int exitCode,
