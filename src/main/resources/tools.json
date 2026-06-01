@@ -1,0 +1,20 @@
+[
+  {
+    "name": "echo",
+    "description": "Echo a message",
+    "command": "cmd.exe",
+    "arguments": [
+      "/c",
+      "echo",
+      "{message}"
+    ],
+    "parameters": [
+      {
+        "name": "message",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "timeout": 5000
+  }
+]
