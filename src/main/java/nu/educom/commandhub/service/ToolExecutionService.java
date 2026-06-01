@@ -6,8 +6,10 @@ import nu.educom.commandhub.model.ExecuteToolRequest;
 import nu.educom.commandhub.model.ExecuteToolResponse;
 import nu.educom.commandhub.model.ToolDefinition;
 import nu.educom.commandhub.registry.ToolRegistry;
+import nu.educom.commandhub.validation.ToolRequestValidator;
 import org.springframework.stereotype.Service;
 
+import javax.tools.Tool;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,18 +18,23 @@ public class ToolExecutionService {
 
     private final ToolRegistry toolRegistry;
     private final ProcessExecutor processExecutor;
+    private final ToolRequestValidator toolRequestValidator;
 
     public ToolExecutionService(
             ToolRegistry toolRegistry,
-            ProcessExecutor processExecutor
+            ProcessExecutor processExecutor,
+            ToolRequestValidator toolRequestValidator
     ) {
         this.toolRegistry = toolRegistry;
         this.processExecutor = processExecutor;
+        this.toolRequestValidator = toolRequestValidator;
     }
 
     public ExecuteToolResponse execute(String toolName, ExecuteToolRequest request) {
         ToolDefinition tool = toolRegistry.findByName(toolName)
                 .orElseThrow(() -> new IllegalArgumentException("Tool not found: " + toolName));
+
+        toolRequestValidator.validate(tool, request);
 
         List<String> command = buildCommand(tool, request);
 
