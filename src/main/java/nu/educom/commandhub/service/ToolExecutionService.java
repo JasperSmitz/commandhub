@@ -7,6 +7,7 @@ import nu.educom.commandhub.model.ExecuteToolResponse;
 import nu.educom.commandhub.model.ToolDefinition;
 import nu.educom.commandhub.registry.ToolRegistry;
 import nu.educom.commandhub.validation.ToolRequestValidator;
+import nu.educom.commandhub.exception.ToolNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.tools.Tool;
@@ -32,7 +33,7 @@ public class ToolExecutionService {
 
     public ExecuteToolResponse execute(String toolName, ExecuteToolRequest request) {
         ToolDefinition tool = toolRegistry.findByName(toolName)
-                .orElseThrow(() -> new IllegalArgumentException("Tool not found: " + toolName));
+                .orElseThrow(() -> new ToolNotFoundException(toolName));
 
         toolRequestValidator.validate(tool, request);
 

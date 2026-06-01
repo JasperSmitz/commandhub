@@ -10,6 +10,14 @@ public class ToolRequestValidator {
 
     public void validate(ToolDefinition tool, ExecuteToolRequest request) {
 
+        if (request == null) {
+            throw new IllegalArgumentException("Request body is required");
+        }
+
+        if (request.parameters() == null) {
+            throw new IllegalArgumentException("Request field 'parameters' is required");
+        }
+
         for (ToolParameter parameter : tool.parameters()) {
 
             if (!parameter.required()) {

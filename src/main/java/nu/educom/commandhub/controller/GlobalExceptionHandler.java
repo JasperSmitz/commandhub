@@ -2,6 +2,7 @@ package nu.educom.commandhub.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import nu.educom.commandhub.exception.ToolNotFoundException;
 
 import java.time.Instant;
 
@@ -13,6 +14,16 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleIllegalArgumentException(IllegalArgumentException exception) {
         return new ErrorResponse(
                 "bad_request",
+                exception.getMessage(),
+                Instant.now().toString()
+        );
+    }
+
+    @ExceptionHandler(ToolNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleToolNotFoundException(ToolNotFoundException exception) {
+        return new ErrorResponse(
+                "not_found",
                 exception.getMessage(),
                 Instant.now().toString()
         );
