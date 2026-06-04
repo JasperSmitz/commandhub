@@ -16,5 +16,17 @@
       }
     ],
     "timeout": 5000
+  },
+  {
+    "name": "java-version",
+    "description": "Show installed Java version",
+    "command": "cmd.exe",
+    "arguments": [
+      "/c",
+      "java",
+      "-version"
+    ],
+    "parameters": [],
+    "timeout": 5000
   }
 ]

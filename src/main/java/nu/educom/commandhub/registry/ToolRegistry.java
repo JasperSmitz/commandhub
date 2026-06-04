@@ -10,10 +10,12 @@ import java.util.Optional;
 @Component
 public class ToolRegistry {
 
-    private final List<ToolDefinition> tools;
+    private final ToolConfigLoader toolConfigLoader;
+    private volatile List<ToolDefinition> tools;
 
     public ToolRegistry(ToolConfigLoader toolConfigLoader) {
-        this.tools = toolConfigLoader.loadTools();
+        this.toolConfigLoader = toolConfigLoader;
+        this.tools = List.copyOf(toolConfigLoader.loadTools());
     }
 
     public List<ToolDefinition> findAll() {
@@ -24,5 +26,11 @@ public class ToolRegistry {
         return tools.stream()
                 .filter(tool -> tool.name().equalsIgnoreCase(name))
                 .findFirst();
+    }
+
+    public int reload() {
+        List<ToolDefinition> newTools = List.copyOf(toolConfigLoader.loadTools());
+        this.tools = newTools;
+        return newTools.size();
     }
 }
