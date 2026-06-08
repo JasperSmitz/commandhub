@@ -6,11 +6,16 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class ProcessExecutor {
 
+    private static final Logger logger = LoggerFactory.getLogger(ProcessExecutor.class);
+
     public ProcessExecutionResult execute(List<String> command, long timeoutMs) {
+        logger.debug("Starting process: {}", command);
         long start = System.currentTimeMillis();
 
         try {
@@ -20,6 +25,8 @@ public class ProcessExecutor {
             boolean finished = process.waitFor(timeoutMs, TimeUnit.MILLISECONDS);
 
             if (!finished) {
+                logger.warn("Process timed out after {}ms: {}", timeoutMs, command);
+
                 process.destroyForcibly();
 
                 long duration = System.currentTimeMillis() - start;
@@ -47,6 +54,7 @@ public class ProcessExecutor {
             );
 
         } catch (IOException exception) {
+            logger.error("Failed to start process: {}", command, exception);
             long duration = System.currentTimeMillis() - start;
 
             return new ProcessExecutionResult(
@@ -58,6 +66,7 @@ public class ProcessExecutor {
             );
 
         } catch (InterruptedException exception) {
+            logger.warn("Process execution interrupted: {}", command, exception);
             Thread.currentThread().interrupt();
 
             long duration = System.currentTimeMillis() - start;

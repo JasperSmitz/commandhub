@@ -9,6 +9,8 @@ import nu.educom.commandhub.registry.ToolRegistry;
 import nu.educom.commandhub.validation.ToolRequestValidator;
 import nu.educom.commandhub.exception.ToolNotFoundException;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.tools.Tool;
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ public class ToolExecutionService {
     private final ToolRegistry toolRegistry;
     private final ProcessExecutor processExecutor;
     private final ToolRequestValidator toolRequestValidator;
+    private static final Logger logger = LoggerFactory.getLogger(ToolExecutionService.class);
 
     public ToolExecutionService(
             ToolRegistry toolRegistry,
@@ -32,6 +35,7 @@ public class ToolExecutionService {
     }
 
     public ExecuteToolResponse execute(String toolName, ExecuteToolRequest request) {
+        logger.info("Executing tool: {}", toolName);
         ToolDefinition tool = toolRegistry.findByName(toolName)
                 .orElseThrow(() -> new ToolNotFoundException(toolName));
 
@@ -44,6 +48,15 @@ public class ToolExecutionService {
         String status = result.exitCode() == 0 && !result.timedOut()
                 ? "success"
                 : "failed";
+
+        logger.info(
+                "Tool '{}' finished with status={}, exitCode={}, durationMs={}, timedOut={}",
+                tool.name(),
+                status,
+                result.exitCode(),
+                result.durationMs(),
+                result.timedOut()
+        );
 
         return new ExecuteToolResponse(
                 tool.name(),
