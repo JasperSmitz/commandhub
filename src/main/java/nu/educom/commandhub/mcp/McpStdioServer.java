@@ -14,6 +14,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Component
 public class McpStdioServer {
@@ -75,6 +77,8 @@ public class McpStdioServer {
                 case "initialize" -> JsonRpcResponse.success(request.id(), initializeResult());
                 case "tools/list" -> JsonRpcResponse.success(request.id(), toolsListResult());
                 case "tools/call" -> JsonRpcResponse.success(request.id(), toolsCallResult(request.params()));
+                case "resources/list" -> JsonRpcResponse.success(request.id(), resourcesListResult());
+                case "resources/read" -> JsonRpcResponse.success(request.id(), resourcesReadResult(request.params()));
                 default -> JsonRpcResponse.error(request.id(), -32601, "Method not found: " + request.method());
             };
         } catch (IllegalArgumentException exception) {
@@ -87,6 +91,7 @@ public class McpStdioServer {
     private Map<String, Object> initializeResult() {
         Map<String, Object> capabilities = new LinkedHashMap<>();
         capabilities.put("tools", Map.of());
+        capabilities.put("resources", Map.of());
 
         Map<String, Object> serverInfo = new LinkedHashMap<>();
         serverInfo.put("name", "commandhub");
@@ -171,5 +176,47 @@ public class McpStdioServer {
                 response.durationMs(),
                 response.timedOut()
         );
+    }
+    private Map<String, Object> resourcesListResult() {
+        return Map.of(
+                "resources",
+                List.of(
+                        Map.of(
+                                "uri", "commandhub://tools/config",
+                                "name", "CommandHub tools configuration",
+                                "description", "The current tools.json configuration used by CommandHub",
+                                "mimeType", "application/json"
+                        )
+                )
+        );
+    }
+
+    private Map<String, Object> resourcesReadResult(JsonNode params) {
+        if (params == null || params.get("uri") == null) {
+            throw new IllegalArgumentException("Resource read parameter 'uri' is required");
+        }
+
+        String uri = params.get("uri").asText();
+
+        if (!"commandhub://tools/config".equals(uri)) {
+            throw new IllegalArgumentException("Unknown resource URI: " + uri);
+        }
+
+        try {
+            String text = Files.readString(Path.of("tools.json"));
+
+            return Map.of(
+                    "contents",
+                    List.of(
+                            Map.of(
+                                    "uri", uri,
+                                    "mimeType", "application/json",
+                                    "text", text
+                            )
+                    )
+            );
+        } catch (Exception exception) {
+            throw new IllegalArgumentException("Failed to read resource: " + exception.getMessage());
+        }
     }
 }

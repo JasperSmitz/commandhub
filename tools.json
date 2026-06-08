@@ -28,5 +28,18 @@
     ],
     "parameters": [],
     "timeout": 5000
+  },
+  {
+    "name": "git-status",
+    "description": "Show the Git status of the current project",
+    "command": "cmd.exe",
+    "arguments": [
+      "/c",
+      "git",
+      "status",
+      "--short"
+    ],
+    "parameters": [],
+    "timeout": 5000
   }
 ]
